@@ -6,16 +6,23 @@ import { getDBInstance } from "../db/utils";
 import { sha256 } from "hono/utils/crypto";
 import { sendVerificationEmail } from "../lib/sendVerificationEmail";
 import { sign } from "hono/jwt";
+import { signInBodySchema } from "../types/schemas/signInBodySchema";
+import { verifyCodeSchema } from "../types/schemas/verifyCodeSchema";
+import { setCookie } from "hono/cookie";
 
 export const userRouter = new Hono<{ Bindings: Env }>();
 const verifyCodeExpiryTime = 15 * 60 * 60; //15 mins code expiry
+const cookieMaxAge = 60 * 60 * 24 * 2; //2 days
 
-//sign up endpoint
+//SIGN UP ENDPOINT
 userRouter.post(
   "/sign-up",
   zValidator("json", signUpBodySchema, (result, c) => {
     if (!result.success) {
-      return c.text("Invalid email or password!", 400);
+      return c.json(
+        { success: false, message: "Invalid email or password!" },
+        400
+      );
     }
   }),
   async (c) => {
@@ -116,6 +123,12 @@ userRouter.post(
         return c.json(emailResponse, 500);
       }
 
+      setCookie(c, "token", token, {
+        secure: true,
+        httpOnly: true,
+        maxAge: cookieMaxAge,
+      });
+
       //successful registration
       return c.json(
         {
@@ -132,6 +145,205 @@ userRouter.post(
         {
           success: false,
           message: "Some error ocurred.",
+        },
+        500
+      );
+    }
+  }
+);
+
+//SIGN IN ENDPOINT
+userRouter.post(
+  "/sign-in",
+  zValidator("json", signInBodySchema, (result, c) => {
+    if (!result.success) {
+      return c.json(
+        { success: false, message: "Invalid email or password!" },
+        400
+      );
+    }
+  }),
+  async (c) => {
+    try {
+      const { email, password } = c.req.valid("json");
+      const prisma = getDBInstance(c);
+      let user;
+
+      //Check for existing user
+      const existingUser = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      console.log(existingUser);
+
+      if (!existingUser) {
+        return c.json(
+          {
+            success: false,
+            message: "User with this email doesnt exists.",
+          },
+          404
+        );
+      }
+
+      const hashedPassword = await sha256(password);
+
+      //Check for user credentials
+      user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      //creating jwt token
+      const token = await sign({ id: user?.id }, c.env.JWT_SECRET);
+
+      if (!user) {
+        return c.json(
+          { success: false, message: "Incorrect email or password" },
+          403
+        );
+      }
+
+      if (!(user?.password === hashedPassword)) {
+        return c.json(
+          {
+            success: false,
+            message: "Incorrect email or password",
+          },
+          409
+        );
+      }
+
+      if (!user.isVerified) {
+        return c.json(
+          {
+            success: false,
+            message: "Please verify your account before loggin in.",
+          },
+          403
+        );
+      }
+
+      user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          bio: true,
+          porfilePicture: true,
+          createdAt: true,
+          isVerified: true,
+        },
+      });
+
+      setCookie(c, "token", token, {
+        secure: true,
+        httpOnly: true,
+        maxAge: cookieMaxAge,
+      });
+
+      return c.json(
+        {
+          success: true,
+          jwt: token,
+          message: "Logged in successfully.",
+          user: user,
+        },
+        200
+      );
+    } catch (error) {}
+  }
+);
+
+//VERIFY VERIFICATION CODE ENDPOINT
+userRouter.post(
+  "/verify-code",
+  zValidator("json", verifyCodeSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ success: false, message: "Incorrect OTP!" }, 400);
+    }
+  }),
+  async (c) => {
+    try {
+      const prisma = getDBInstance(c);
+      const { email, code } = c.req.valid("json");
+      const decodedEmail = decodeURIComponent(email);
+
+      const user = await prisma.user.findUnique({
+        where: {
+          email: decodedEmail,
+        },
+      });
+
+      if (!user) {
+        return c.json(
+          {
+            success: false,
+            message: "User not found. Try signing up.",
+          },
+          404
+        );
+      }
+
+      const isCodeValid = user.verifyCode === code;
+      const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date();
+
+      if (isCodeValid && isCodeNotExpired) {
+        const result = await prisma.user.update({
+          data: {
+            isVerified: true,
+          },
+          where: {
+            email: decodedEmail,
+          },
+        });
+
+        if (!result) {
+          return c.json(
+            {
+              success: false,
+              message: "User couldnt be verified successfully. Sign up again.",
+            },
+            500
+          );
+        }
+
+        return c.json(
+          {
+            success: true,
+            message: "User verified successfully.",
+          },
+          200
+        );
+      } else if (!isCodeNotExpired) {
+        return c.json(
+          {
+            success: false,
+            message: "Verfication code has expired. Please sign up again.",
+          },
+          500
+        );
+      } else {
+        return c.json(
+          {
+            success: false,
+            message: "Verfication code is incorrect.",
+          },
+          500
+        );
+      }
+    } catch (error) {
+      console.log("Error verifying the user", error);
+      return c.json(
+        {
+          success: false,
+          message: "Error verifying the user.",
         },
         500
       );
