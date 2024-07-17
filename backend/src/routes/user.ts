@@ -1,14 +1,16 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { signUpBodySchema } from "../types/schemas/signUpBodySchema";
 import { Env } from "../types/types";
 import { getDBInstance } from "../db/utils";
 import { sha256 } from "hono/utils/crypto";
 import { sendVerificationEmail } from "../lib/sendVerificationEmail";
 import { sign, verify } from "hono/jwt";
-import { signInBodySchema } from "../types/schemas/signInBodySchema";
-import { verifyCodeSchema } from "../types/schemas/verifyCodeSchema";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import {
+  signUpBodySchema,
+  signInBodySchema,
+  verifyCodeSchema,
+} from "@adityaj07/common-app";
 
 export const userRouter = new Hono<{
   Bindings: Env;

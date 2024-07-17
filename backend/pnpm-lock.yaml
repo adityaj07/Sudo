@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@adityaj07/common-app':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@prisma/client':
         specifier: 5.17.0
         version: 5.17.0(prisma@5.17.0)
@@ -20,9 +23,6 @@ importers:
       resend:
         specifier: ^3.4.0
         version: 3.4.0
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20240529.0
@@ -35,6 +35,9 @@ importers:
         version: 3.65.0(@cloudflare/workers-types@4.20240712.0)
 
 packages:
+
+  '@adityaj07/common-app@1.0.0':
+    resolution: {integrity: sha512-hWL+hJiLDMcqWW9Q91v5/aeI/ggVFoO2BBBYsmVhTBMfFWSSM3+B0xpo15fgZV3TTfQUBuxwvAkifYQgzrpV8A==}
 
   '@cloudflare/kv-asset-handler@0.3.4':
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
@@ -746,6 +749,11 @@ packages:
   tslib@2.6.3:
     resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
 
+  typescript@5.5.3:
+    resolution: {integrity: sha512-/hreyEujaB0w76zKo6717l3L0o/qEUtRgdvUBvlkhoWeOVMjMuHNHk0BRBzikzuGDqNmPQbg5ifMEqsHLiIUcQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   ufo@1.5.3:
     resolution: {integrity: sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw==}
 
@@ -809,6 +817,11 @@ packages:
     resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
 
 snapshots:
+
+  '@adityaj07/common-app@1.0.0':
+    dependencies:
+      typescript: 5.5.3
+      zod: 3.23.8
 
   '@cloudflare/kv-asset-handler@0.3.4':
     dependencies:
@@ -1438,6 +1451,8 @@ snapshots:
       is-number: 7.0.0
 
   tslib@2.6.3: {}
+
+  typescript@5.5.3: {}
 
   ufo@1.5.3: {}
 
