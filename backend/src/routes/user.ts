@@ -16,8 +16,10 @@ export const userRouter = new Hono<{
     userId: string;
   };
 }>();
-const verifyCodeExpiryTime = 15 * 60 * 1000; //15 mins code expiry in milliseconds
+const verifyCodeExpiryTime = 15 * 60 * 1000; //15 mins otp code expiry in milliseconds
 const cookieMaxAge = 60 * 60 * 24 * 2; //2 days
+
+//AUTH ENDPOINTS START--------
 
 //SIGN UP ENDPOINT
 userRouter.post(
@@ -358,7 +360,7 @@ userRouter.post(
   }
 );
 
-//AUTH MIDDLEWARE
+//AUTH MIDDLEWARE => Endpoints above this are unprotected
 userRouter.use("/*", async (c, next) => {
   const tokenFromCookie = getCookie(c, "token");
 
@@ -396,5 +398,111 @@ userRouter.post("/logout", async (c) => {
   } catch (error) {
     console.error("Logout error:", error);
     return c.json({ success: false, message: "Error during logout" }, 500);
+  }
+});
+
+//AUTH ENDPOINTS END--------
+
+//USER ENDPOINTS START--------
+
+//GET A USER BY id
+userRouter.get("/:id", async (c) => {
+  const prisma = getDBInstance(c);
+  const userId = c.req.param("id");
+  const authorizedUserId = c.get("userId");
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return c.json(
+        {
+          success: false,
+          message: "User does not exist.",
+        },
+        404
+      );
+    }
+
+    return c.json(
+      {
+        user,
+        isAuthorizedUser: authorizedUserId === userId,
+        success: true,
+        message: "User found",
+      },
+      200
+    );
+  } catch (error) {
+    return c.json(
+      {
+        success: false,
+        message: "Some error occured fetching the user.",
+        error: error,
+      },
+      500
+    );
+  }
+});
+
+//TODO: UPDATE A USER
+// userRouter.put("/update-user", async (c) => {
+
+// });
+
+//DELETE A USER
+userRouter.delete("/:id", async (c) => {
+  try {
+    const prisma = getDBInstance(c);
+    const userId = c.req.param("id");
+    const authorizedUserId = c.get("userId");
+
+    if (authorizedUserId !== userId) {
+      return c.json(
+        {
+          success: false,
+          message: "Unauthorized to delete.",
+        },
+        401
+      );
+    }
+
+    const deletedUser = await prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!deletedUser) {
+      return c.json(
+        {
+          success: false,
+          message: "Error deleting the user.",
+        },
+        500
+      );
+    }
+
+    return c.json(
+      {
+        success: true,
+        message: "User deleted successfully.",
+      },
+      200
+    );
+  } catch (error) {
+    console.error(error);
+    return c.json(
+      {
+        success: false,
+        message: "Error deleting user.",
+        error: error,
+      },
+      500
+    );
   }
 });
