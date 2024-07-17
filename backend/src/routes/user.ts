@@ -5,13 +5,18 @@ import { Env } from "../types/types";
 import { getDBInstance } from "../db/utils";
 import { sha256 } from "hono/utils/crypto";
 import { sendVerificationEmail } from "../lib/sendVerificationEmail";
-import { sign } from "hono/jwt";
+import { sign, verify } from "hono/jwt";
 import { signInBodySchema } from "../types/schemas/signInBodySchema";
 import { verifyCodeSchema } from "../types/schemas/verifyCodeSchema";
-import { setCookie } from "hono/cookie";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 
-export const userRouter = new Hono<{ Bindings: Env }>();
-const verifyCodeExpiryTime = 15 * 60 * 60; //15 mins code expiry
+export const userRouter = new Hono<{
+  Bindings: Env;
+  Variables: {
+    userId: string;
+  };
+}>();
+const verifyCodeExpiryTime = 15 * 60 * 1000; //15 mins code expiry in milliseconds
 const cookieMaxAge = 60 * 60 * 24 * 2; //2 days
 
 //SIGN UP ENDPOINT
@@ -322,6 +327,8 @@ userRouter.post(
           200
         );
       } else if (!isCodeNotExpired) {
+        console.log(isCodeNotExpired);
+
         return c.json(
           {
             success: false,
@@ -350,3 +357,44 @@ userRouter.post(
     }
   }
 );
+
+//AUTH MIDDLEWARE
+userRouter.use("/*", async (c, next) => {
+  const tokenFromCookie = getCookie(c, "token");
+
+  if (!tokenFromCookie) {
+    return c.json(
+      {
+        success: false,
+        message: "Authentication token is missing.",
+      },
+      401
+    );
+  }
+  const user = await verify(tokenFromCookie, c.env.JWT_SECRET);
+  if (user && typeof user.id === "string") {
+    c.set("userId", user.id);
+    return next();
+  } else {
+    return c.json({ success: false, message: "Unauthorized" }, 403);
+  }
+});
+
+//LOGOUT ENDPOINT
+userRouter.post("/logout", async (c) => {
+  try {
+    const userId = c.get("userId");
+    const deletedCookie = deleteCookie(c, "token", {
+      secure: true,
+    });
+
+    if (!deletedCookie) {
+      return c.json({ success: false, message: "Error logging out." }, 500);
+    }
+
+    return c.json({ success: true, message: "Logged out successfully" }, 200);
+  } catch (error) {
+    console.error("Logout error:", error);
+    return c.json({ success: false, message: "Error during logout" }, 500);
+  }
+});
