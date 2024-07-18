@@ -54,10 +54,10 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
         password: password.trim(),
       };
 
-      console.log(process.env.BACKEND_URL);
+      console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
 
       const response = await axios.post(
-        `${process.env.BACKEND_URL}/api/v1/user/sign-in`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/sign-in`,
         requestData
       );
 

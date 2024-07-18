@@ -57,7 +57,7 @@ const SignupForm: FC<SignupFormProps> = ({}) => {
       };
 
       const response = await axios.post(
-        `${process.env.BACKEND_URL}/api/v1/user/sign-up`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/sign-up`,
         requestData
       );
 
