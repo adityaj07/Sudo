@@ -11,6 +11,7 @@ import {
   signInBodySchema,
   verifyCodeSchema,
 } from "@adityaj07/common-app";
+import { QuerySchema } from "../types/Schemas/QuerySchema";
 
 export const userRouter = new Hono<{
   Bindings: Env;
@@ -366,6 +367,8 @@ userRouter.post(
 userRouter.use("/*", async (c, next) => {
   const tokenFromCookie = getCookie(c, "token");
 
+  console.log(tokenFromCookie);
+
   if (!tokenFromCookie) {
     return c.json(
       {
@@ -405,6 +408,262 @@ userRouter.post("/logout", async (c) => {
 
 //AUTH ENDPOINTS END--------
 
+//USER BLOGS ENDPOINTS START--------
+//GET All blogs of a user
+userRouter.get(
+  "/blogs",
+  zValidator("query", QuerySchema, (result, c) => {
+    if (!result.success) {
+      return c.json(
+        {
+          success: false,
+          message: "Invalid query paramters",
+          errors: result.error.errors,
+        },
+        400
+      );
+    }
+  }),
+  async (c) => {
+    try {
+      const prisma = getDBInstance(c);
+      const authorId = c.get("userId");
+      const { page, pageSize, sortBy, order } = c.req.valid("query");
+
+      console.log(authorId);
+
+      const query = {
+        where: {
+          authorId,
+        },
+        orderBy: { [sortBy]: order },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      };
+
+      // if (author) {
+      //   query.where = {
+      //     ...query.where,
+      //     author: {
+      //       name: {
+      //         contains: author,
+      //         mode: "insensitive",
+      //       },
+      //     },
+      //   };
+      // }
+
+      const [blogs, totalCount] = await Promise.all([
+        prisma.post.findMany(query),
+        prisma.post.count({
+          where: query.where,
+        }),
+      ]);
+
+      const response = {
+        success: true,
+        message: "Fetched blogs successfully",
+        data: blogs.map((blog) => ({
+          id: blog.id,
+          title: blog.title,
+          content: blog.content,
+          publishedAt: blog.publishedAt,
+          author: blog.author,
+        })),
+        pagination: {
+          currentPage: page,
+          pageSize: pageSize,
+          totalPages: Math.ceil(totalCount / pageSize),
+          totalCount: totalCount,
+        },
+      };
+
+      if (!blogs && !totalCount) {
+        return c.json(
+          {
+            success: false,
+            message: "Error fetching blogs",
+          },
+          500
+        );
+      }
+
+      return c.json(response, 200);
+    } catch (error) {
+      return c.json(
+        {
+          success: false,
+          message: "Internal server error: " + error,
+        },
+        500
+      );
+    }
+  }
+);
+
+//GET A single blog of a user
+userRouter.get("/blogs/:blogId", async (c) => {
+  try {
+    const prisma = getDBInstance(c);
+    const blogId = c.req.param("blogId");
+    const authorId = c.get("userId");
+
+    const blog = await prisma.post.findUnique({
+      where: {
+        id: blogId,
+        authorId: authorId,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!blog) {
+      return c.json(
+        {
+          success: false,
+          message: "Blog not found.",
+        },
+        404
+      );
+    }
+
+    const response = {
+      success: true,
+      message: "Fetched blog successfully",
+      data: {
+        id: blog.id,
+        title: blog.title,
+        content: blog.content,
+        publishedAt: blog.publishedAt,
+        author: blog.author,
+      },
+    };
+
+    return c.json(response, 200);
+  } catch (error) {
+    console.error("Error fetching blog: ", error);
+    return c.json(
+      {
+        success: false,
+        message: "Error fetching the blog",
+      },
+      500
+    );
+  }
+});
+
+//GET All drafts of a user
+userRouter.get(
+  "/drafts",
+  zValidator("query", QuerySchema, (result, c) => {
+    if (!result.success) {
+      return c.json(
+        {
+          success: false,
+          message: "Invalid query paramters",
+        },
+        400
+      );
+    }
+  }),
+  async (c) => {
+    try {
+      const prisma = getDBInstance(c);
+      const { page, pageSize, sortBy, order } = c.req.valid("query");
+      const authorId = c.get("userId");
+
+      const query = {
+        where: {
+          authorId: authorId,
+          published: false,
+        },
+        orderBy: { [sortBy]: order },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      };
+
+      const [drafts, totalCount] = await Promise.all([
+        prisma.post.findMany(query),
+        prisma.post.count({
+          where: query.where,
+        }),
+      ]);
+
+      if (totalCount === 0) {
+        return c.json(
+          {
+            success: false,
+            message: "No drafts found.",
+          },
+          404
+        );
+      }
+
+      const response = {
+        success: true,
+        message: "Fetched drafts successfully",
+        data: drafts.map((draft) => ({
+          id: draft.id,
+          title: draft.title,
+          content: draft.content,
+          publishedAt: draft.publishedAt,
+          author: draft.author,
+        })),
+        pagination: {
+          currentPage: page,
+          pageSize: pageSize,
+          totalPages: Math.ceil(totalCount / pageSize),
+          totalCount: totalCount,
+        },
+      };
+
+      if (!drafts && !totalCount) {
+        return c.json(
+          {
+            success: false,
+            message: "Error fetching drafts",
+          },
+          500
+        );
+      }
+
+      return c.json(response, 200);
+    } catch (error) {
+      return c.json(
+        {
+          success: false,
+          message: "Internal server error: " + error,
+        },
+        500
+      );
+    }
+  }
+);
+
+//USER BLOGS ENDPOINTS END--------
+
 //USER ENDPOINTS START--------
 
 //GET A USER BY id
@@ -417,6 +676,18 @@ userRouter.get("/:id", async (c) => {
     const user = await prisma.user.findFirst({
       where: {
         id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        porfilePicture: true,
+        createdAt: true,
+        isVerified: true,
+        verifyCode: false,
+        verifyCodeExpiry: false,
+        password: false,
       },
     });
 
@@ -508,3 +779,5 @@ userRouter.delete("/:id", async (c) => {
     );
   }
 });
+
+//USER ENDPOINTS END--------

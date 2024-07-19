@@ -96,6 +96,16 @@ blogRouter.get(
         );
       }
 
+      if (totalCount === 0) {
+        return c.json(
+          {
+            success: false,
+            message: "No blogs found.",
+          },
+          404
+        );
+      }
+
       return c.json(response, 200);
     } catch (error) {
       return c.json(
@@ -111,8 +121,8 @@ blogRouter.get(
 
 //GET /:blogId => Get one blog regardless of user
 blogRouter.get("/:blogId", async (c) => {
-  const prisma = getDBInstance(c);
   try {
+    const prisma = getDBInstance(c);
     const blogId = c.req.param("blogId");
 
     const blog = await prisma.post.findUnique({
@@ -146,7 +156,7 @@ blogRouter.get("/:blogId", async (c) => {
         id: blog.id,
         title: blog.title,
         content: blog.content,
-        publishedAt: blog.published,
+        publishedAt: blog.publishedAt,
         author: blog.author,
       },
     };
@@ -408,3 +418,4 @@ blogRouter.post("/:blogId/publish", async (c) => {
     );
   }
 });
+
