@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@adityaj07/common-app':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^1.1.0
+        version: 1.1.0
       '@prisma/client':
         specifier: 5.17.0
         version: 5.17.0(prisma@5.17.0)
@@ -39,8 +39,8 @@ importers:
 
 packages:
 
-  '@adityaj07/common-app@1.0.0':
-    resolution: {integrity: sha512-hWL+hJiLDMcqWW9Q91v5/aeI/ggVFoO2BBBYsmVhTBMfFWSSM3+B0xpo15fgZV3TTfQUBuxwvAkifYQgzrpV8A==}
+  '@adityaj07/common-app@1.1.0':
+    resolution: {integrity: sha512-bDEHYcI/T1E4xPeQL3wTwz4yKajRAMe3yDIyZBAbMe49PbGyE48Lhl3sES6CrcV/93Vi39oXnx5i8N38dRKsDg==}
 
   '@cloudflare/kv-asset-handler@0.3.4':
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
@@ -757,8 +757,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  ufo@1.5.3:
-    resolution: {integrity: sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw==}
+  ufo@1.5.4:
+    resolution: {integrity: sha512-UsUk3byDzKd04EyoZ7U4DOlxQaD14JUKQl6/P7wiX4FNvUfm3XL246n9W5AmqwW5RSFJ27NAuM0iLscAOYUiGQ==}
 
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
@@ -821,7 +821,7 @@ packages:
 
 snapshots:
 
-  '@adityaj07/common-app@1.0.0':
+  '@adityaj07/common-app@1.1.0':
     dependencies:
       typescript: 5.5.3
       zod: 3.23.8
@@ -1457,7 +1457,7 @@ snapshots:
 
   typescript@5.5.3: {}
 
-  ufo@1.5.3: {}
+  ufo@1.5.4: {}
 
   undici-types@5.26.5: {}
 
@@ -1472,7 +1472,7 @@ snapshots:
       mime: 3.0.0
       node-fetch-native: 1.6.4
       pathe: 1.1.2
-      ufo: 1.5.3
+      ufo: 1.5.4
 
   which@2.0.2:
     dependencies:

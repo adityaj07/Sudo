@@ -10,8 +10,8 @@ import {
   signUpBodySchema,
   signInBodySchema,
   verifyCodeSchema,
+  QuerySchema,
 } from "@adityaj07/common-app";
-import { QuerySchema } from "../types/Schemas/QuerySchema";
 
 export const userRouter = new Hono<{
   Bindings: Env;
@@ -118,8 +118,9 @@ userRouter.post(
 
       //Send verification email
       const emailResponse = await sendVerificationEmail(
+        user.name as string,
         email,
-        name,
+        user.id,
         verifyCode,
         c.env,
         c
@@ -282,12 +283,11 @@ userRouter.post(
   async (c) => {
     try {
       const prisma = getDBInstance(c);
-      const { email, code } = c.req.valid("json");
-      const decodedEmail = decodeURIComponent(email);
+      const { userId, code } = c.req.valid("json");
 
       const user = await prisma.user.findUnique({
         where: {
-          email: decodedEmail,
+          id: userId,
         },
       });
 
@@ -310,7 +310,7 @@ userRouter.post(
             isVerified: true,
           },
           where: {
-            email: decodedEmail,
+            id: userId,
           },
         });
 
