@@ -1,6 +1,6 @@
 {
   "name": "@adityaj07/common-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "This is a common file for Sudo blog project.",
   "main": "dist/index.js",
   "scripts": {
