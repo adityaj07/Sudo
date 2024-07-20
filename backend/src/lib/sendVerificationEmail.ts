@@ -9,8 +9,9 @@ interface EmailResponse {
 }
 
 export async function sendVerificationEmail(
-  email: string,
   name: string,
+  email: string,
+  userId: string,
   verifyCode: string,
   env: Env,
   c: Context
@@ -19,7 +20,7 @@ export async function sendVerificationEmail(
     // console.log(env.RESEND_API_KEY);
     const resend = new Resend(env.RESEND_API_KEY);
 
-    const emailVerificationLink = `${env.FRONTEND_URL}/verify-email/${name}`;
+    const emailVerificationLink = `${env.FRONTEND_URL}/verify-code/${userId}`;
 
     // HTML email template
     const htmlContent = `
@@ -30,16 +31,16 @@ export async function sendVerificationEmail(
           <p>Or you can click the link below to verify your email address:</p>
           <a href="${emailVerificationLink}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
           <p>This OTP is valid for 15 minutes. If you did not create an account, please ignore this email.</p>
-          <p>Best regards,<br>ByteDev</p>
+          <p>Best regards,<br>Sudo</p>
       </div>
     `;
 
     // console.log(email);
 
     const result = await resend.emails.send({
-      from: "ByteDev <onboarding@resend.dev>",
+      from: "Sudo <onboarding@resend.dev>",
       to: `${email}`,
-      subject: "ByteDev | Verification Code",
+      subject: "Sudo | Verification Code",
       html: htmlContent,
     });
 
