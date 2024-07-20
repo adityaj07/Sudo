@@ -13,12 +13,10 @@ import {
 } from "@/components/ui/card";
 import {
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
+  FormControl, FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -57,19 +55,29 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
       console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/sign-in`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/sign-in`,
         requestData
       );
 
-      if (response.status === 200) {
+      console.log(response.data);
+
+      if (response.data.success === false) {
         toast({
           description: response.data.message,
+          variant: "destructive",
         });
-        router.replace("/");
+        return;
       }
-    } catch (error) {
+
       toast({
-        description: "Error loggin in",
+        description: response.data.message,
+      });
+      router.replace("/home");
+    } catch (error) {
+      console.error(error);
+      toast({
+        description: "Error signing in",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -80,9 +88,7 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
     <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-xl">Sign In</CardTitle>
-        <CardDescription>
-          Enter your information to sign in to your account
-        </CardDescription>
+        <CardDescription>Welcome back, sign in to your account</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -96,7 +102,6 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
                   <FormControl>
                     <Input placeholder="potus@joe.com" {...field} />
                   </FormControl>
-                  <FormDescription>Enter your email.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -110,7 +115,6 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
                   <FormControl>
                     <Input type="password" placeholder="******" {...field} />
                   </FormControl>
-                  <FormDescription>Enter your password.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

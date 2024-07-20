@@ -29,6 +29,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icons } from "@/components/icons";
 import axios from "axios";
+import { truncate } from "fs";
 
 interface SignupFormProps {}
 
@@ -57,15 +58,15 @@ const SignupForm: FC<SignupFormProps> = ({}) => {
       };
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/sign-up`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/sign-up`,
         requestData
       );
 
-      if (response.status === 201) {
+      if (response.data.succes === true) {
         toast({
           description: response.data.message,
         });
-        router.replace(`/verify-code/${email}`);
+        router.replace(`/verify-code/${response.data.user.id}`);
       }
     } catch (error) {
       toast({
@@ -75,17 +76,16 @@ const SignupForm: FC<SignupFormProps> = ({}) => {
       setIsSubmitting(false);
     }
   };
+
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-xl">Sign Up</CardTitle>
-        <CardDescription>
-          Enter your information to create an account
-        </CardDescription>
+        <CardDescription>Create your account to start writing</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               name="name"
               control={form.control}
@@ -109,9 +109,6 @@ const SignupForm: FC<SignupFormProps> = ({}) => {
                   <FormControl>
                     <Input placeholder="potus@joe.com" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Verification email will be sent to this email.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -125,7 +122,6 @@ const SignupForm: FC<SignupFormProps> = ({}) => {
                   <FormControl>
                     <Input type="password" placeholder="******" {...field} />
                   </FormControl>
-                  <FormDescription>Enter a secure password.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

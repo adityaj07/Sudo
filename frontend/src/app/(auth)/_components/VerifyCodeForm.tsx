@@ -1,27 +1,26 @@
 "use client";
 
-import { FC, useState, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import axios from "axios";
-import { Loader2, AlertCircle } from "lucide-react";
-
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
+import { useParams } from "next/navigation";
+import { FC, useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -30,58 +29,47 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 import { Icons } from "@/components/icons";
-import { verifyCodeSchema } from "@adityaj07/common-app";
+// import { verifyCodeSchema } from "@adityaj07/common-app";
+import axios from "axios";
 
-interface VerifyCodeProps {}
+interface VerifyCodeFormProps {}
 
-const VerifyCode: FC<VerifyCodeProps> = () => {
+export const verifyCodeSchema = z.object({
+  userId: z.string().uuid(),
+  code: z.string().length(6),
+});
+
+const VerifyCodeForm: FC<VerifyCodeFormProps> = ({}) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const params = useParams();
+  const params = useParams<{ userId: string }>();
   const router = useRouter();
-
-  const email = useMemo(() => {
-    const emailParam = params?.email as string;
-    if (!emailParam) {
-      setError("Invalid email parameter");
-      setIsLoading(false);
-      return null;
-    }
-    try {
-      const decodedEmail = decodeURIComponent(emailParam);
-      setIsLoading(false);
-      return decodedEmail;
-    } catch {
-      setError("Unable to decode email parameter");
-      setIsLoading(false);
-      return null;
-    }
-  }, [params]);
 
   const form = useForm<z.infer<typeof verifyCodeSchema>>({
     resolver: zodResolver(verifyCodeSchema),
     defaultValues: {
+      userId: params.userId,
       code: "",
     },
+    mode: "onChange",
   });
 
   const onSubmit = async (data: z.infer<typeof verifyCodeSchema>) => {
-    if (!email) return;
-
     try {
       setIsSubmitting(true);
       const { code } = data;
-      const requestData = { email, code };
+      const requestData = {
+        userId: params.userId,
+        code,
+      };
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/verify-code`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/verify-code`,
         requestData
       );
 
-      if (response.status === 201) {
+      if (response.data.success === true) {
         toast({
           description: response.data.message,
         });
@@ -89,49 +77,12 @@ const VerifyCode: FC<VerifyCodeProps> = () => {
       }
     } catch (error) {
       toast({
-        description: "Error verifying the code",
+        description: "Error verifying the code" + error,
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Card className="w-[300px] text-center">
-          <CardHeader>
-            <CardTitle>Loading</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-            <p className="mt-2">Preparing verification...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Card className="w-[300px] text-center">
-          <CardHeader>
-            <CardTitle className="text-red-600">Error</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <AlertCircle className="h-8 w-8 text-red-600 mx-auto" />
-            <p className="mt-2">{error}</p>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => router.push("/sign-up")} className="w-full">
-              Back to Sign Up
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <Card>
@@ -182,4 +133,4 @@ const VerifyCode: FC<VerifyCodeProps> = () => {
   );
 };
 
-export default VerifyCode;
+export default VerifyCodeForm;
