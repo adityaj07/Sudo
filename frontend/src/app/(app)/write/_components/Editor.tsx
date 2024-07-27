@@ -4,7 +4,7 @@ import React, {
   useCallback,
   // useMemo,
   useRef,
-  useState
+  useState,
 } from "react";
 import {
   EditorRoot,
@@ -52,6 +52,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/icons";
+import apiClient from "@/lib/apiClient";
 
 type FormValues = {
   title: string;
@@ -127,13 +128,7 @@ const Editor = ({}) => {
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/blogs`,
-        data,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await apiClient.post(`/blogs`, data);
 
       const publishedOrDrafted = data.published ? "published" : "drafted";
 
