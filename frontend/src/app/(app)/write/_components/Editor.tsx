@@ -133,11 +133,11 @@ const Editor = ({}) => {
       const publishedOrDrafted = data.published ? "published" : "drafted";
 
       if (response.data.success === true) {
+        router.push("/home");
+        router.refresh();
         toast({
           description: `Blog ${publishedOrDrafted} successfully.`,
         });
-        router.push("/home");
-        router.refresh();
       } else {
         toast({
           description: `Could not pulish blog.`,
