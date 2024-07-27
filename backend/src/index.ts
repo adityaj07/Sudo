@@ -7,7 +7,7 @@ import { Env } from "./types/types";
 const app = new Hono<{ Bindings: Env }>();
 
 app.use("*", async (c, next) => {
-  const frontendUrls = c.env.FRONTEND_URL.split(",");
+  const frontendUrls = c.env.FRONTEND_URL;
 
   return cors({
     origin: frontendUrls,
