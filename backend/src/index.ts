@@ -7,10 +7,9 @@ import { Env } from "./types/types";
 const app = new Hono<{ Bindings: Env }>();
 
 app.use("*", async (c, next) => {
-  // const origin = c.env.FRONTEND_URL
   const frontendUrls = c.env.FRONTEND_URL.split(",");
+
   return cors({
-    // origin:[origin],
     origin: frontendUrls,
     allowMethods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
