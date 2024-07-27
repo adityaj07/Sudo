@@ -29,7 +29,7 @@ export async function sendVerificationEmail(
           <p>Thank you for registering an account with us. Please verify your email address by using the OTP below:</p>
           <p style="font-size: 24px; font-weight: bold; color: #333;">${verifyCode}</p>
           <p>Or you can click the link below to verify your email address:</p>
-          <a href="${emailVerificationLink}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
+          <a href="${emailVerificationLink}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; background-color: #FA8500; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
           <p>This OTP is valid for 15 minutes. If you did not create an account, please ignore this email.</p>
           <p>Best regards,<br>Sudo</p>
       </div>
@@ -38,7 +38,7 @@ export async function sendVerificationEmail(
     // console.log(email);
 
     const result = await resend.emails.send({
-      from: "Sudo <onboarding@resend.dev>",
+      from: "Sudo <noreply@adityaj07.tech>",
       to: `${email}`,
       subject: "Sudo | Verification Code",
       html: htmlContent,
