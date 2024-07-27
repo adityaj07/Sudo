@@ -35,7 +35,8 @@ const LatestBlogs: FC<LatestBlogsProps> = ({ initialData }) => {
 
     try {
       const data = await blogService.getLatestBlogs(pagination.currentPage + 1);
-      if (data.blogs.length === 0) {
+
+      if (data && data.blogs.length === 0) {
         setHasMore(false);
       } else {
         setBlogs((prevBlogs) => {
@@ -65,7 +66,7 @@ const LatestBlogs: FC<LatestBlogsProps> = ({ initialData }) => {
   }, [pagination, loading, hasMore]);
 
   useEffect(() => {
-    if (blogs.length === 0 && !loading && hasMore && !isError) {
+    if (blogs && blogs.length === 0 && !loading && hasMore && !isError) {
       fetchBlogs();
     }
   }, [blogs.length, loading, hasMore, isError, fetchBlogs]);
