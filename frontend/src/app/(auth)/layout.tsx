@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: React.PropsWithChildren) {
         href="/"
         className="absolute left-8 top-6 z-20 flex items-center text-lg font-bold tracking-tight text-foreground/80 transition-colors hover:text-foreground"
       >
-        <Icons.logo className="mr-2 size-6 text-white" aria-hidden="true" />
+        <Icons.logo className="mr-2 size-6 dark:bg-white" aria-hidden="true" />
         <span>Sudo</span>
       </Link>
       <main className="flex items-center justify-center lg:items-center lg:justify-center">
