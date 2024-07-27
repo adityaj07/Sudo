@@ -71,7 +71,7 @@ blogRouter.get(
       const response = {
         success: true,
         message: "Fetched blogs successfully",
-        data: blogs.map((blog) => ({
+        blogs: blogs.map((blog) => ({
           id: blog.id,
           title: blog.title,
           content: blog.content,
@@ -152,7 +152,7 @@ blogRouter.get("/:blogId", async (c) => {
     const response = {
       success: true,
       message: "Fetched blog successfully",
-      data: {
+      blog: {
         id: blog.id,
         title: blog.title,
         content: blog.content,
@@ -251,13 +251,11 @@ blogRouter.post(
   }
 );
 
-
 //PUT /:blogId => Update  blog
 blogRouter.put(
   "/:blogId",
   zValidator("json", UpdateBlogSchema, (result, c) => {
     if (!result.success) {
-      
       return c.json(
         {
           success: false,
@@ -418,4 +416,3 @@ blogRouter.post("/:blogId/publish", async (c) => {
     );
   }
 });
-

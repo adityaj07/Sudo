@@ -135,8 +135,8 @@ userRouter.post(
       }
 
       setCookie(c, "token", token, {
-        secure: true,
-        httpOnly: true,
+        // secure: true,
+        // httpOnly: true,
         maxAge: cookieMaxAge,
       });
 
@@ -256,6 +256,7 @@ userRouter.post(
       setCookie(c, "token", token, {
         secure: true,
         httpOnly: true,
+        // path:"",
         maxAge: cookieMaxAge,
       });
 
@@ -471,7 +472,7 @@ userRouter.get(
       const response = {
         success: true,
         message: "Fetched blogs successfully",
-        data: blogs.map((blog) => ({
+        blogs: blogs.map((blog) => ({
           id: blog.id,
           title: blog.title,
           content: blog.content,
@@ -544,7 +545,7 @@ userRouter.get("/blogs/:blogId", async (c) => {
     const response = {
       success: true,
       message: "Fetched blog successfully",
-      data: {
+      blog: {
         id: blog.id,
         title: blog.title,
         content: blog.content,
@@ -624,7 +625,7 @@ userRouter.get(
       const response = {
         success: true,
         message: "Fetched drafts successfully",
-        data: drafts.map((draft) => ({
+        drafts: drafts.map((draft) => ({
           id: draft.id,
           title: draft.title,
           content: draft.content,
