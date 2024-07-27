@@ -28,6 +28,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icons } from "@/components/icons";
 import axios from "axios";
+import apiClient from "@/lib/apiClient";
 
 interface SignInFormProps {}
 
@@ -55,12 +56,9 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
 
       // console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/sign-in`,
-        requestData,
-        {
-          withCredentials: true,
-        }
+      const response = await apiClient.post(
+        `/users/sign-in`,
+        requestData
       );
 
       // console.log(response.data);

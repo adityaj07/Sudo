@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useParams } from "next/navigation";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,10 +17,8 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -32,7 +30,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/icons";
 // import { verifyCodeSchema } from "@adityaj07/common-app";
-import axios from "axios";
+import apiClient from "@/lib/apiClient";
 
 interface VerifyCodeFormProps {}
 
@@ -64,10 +62,7 @@ const VerifyCodeForm: FC<VerifyCodeFormProps> = ({}) => {
         code,
       };
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/verify-code`,
-        requestData
-      );
+      const response = await apiClient.post(`/users/verify-code`, requestData);
 
       if (response.data.success === true) {
         toast({

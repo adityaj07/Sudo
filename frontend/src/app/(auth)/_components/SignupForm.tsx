@@ -30,6 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Icons } from "@/components/icons";
 import axios from "axios";
 import { truncate } from "fs";
+import apiClient from "@/lib/apiClient";
 
 interface SignupFormProps {}
 
@@ -57,10 +58,7 @@ const SignupForm: FC<SignupFormProps> = ({}) => {
         password: password.trim(),
       };
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/sign-up`,
-        requestData
-      );
+      const response = await apiClient.post(`/users/sign-up`, requestData);
 
       if (response.data.succes === true) {
         toast({
