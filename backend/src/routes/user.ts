@@ -137,6 +137,7 @@ userRouter.post(
       setCookie(c, "token", token, {
         secure: true,
         httpOnly: true,
+        sameSite: "None",
         maxAge: cookieMaxAge,
       });
 
@@ -256,6 +257,7 @@ userRouter.post(
       setCookie(c, "token", token, {
         secure: true,
         httpOnly: true,
+        sameSite: "None",
         maxAge: cookieMaxAge,
       });
 
