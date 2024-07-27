@@ -13,10 +13,11 @@ import {
 } from "@/components/ui/card";
 import {
   Form,
-  FormControl, FormField,
+  FormControl,
+  FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -52,14 +53,17 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
         password: password.trim(),
       };
 
-      console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
+      // console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/sign-in`,
-        requestData
+        requestData,
+        {
+          withCredentials: true,
+        }
       );
 
-      console.log(response.data);
+      // console.log(response.data);
 
       if (response.data.success === false) {
         toast({

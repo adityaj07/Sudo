@@ -1,13 +1,14 @@
 import { FC } from "react";
-import LatestBlogs from "./_components/LatestBlogs";
+import HomeTabs from "./_components/HomeTabs";
 
 interface HomeProps {}
 
-const Home: FC<HomeProps> = ({}) => {
-  return <div className="min-h-dvh">
-   <LatestBlogs />
-
-  </div>;
+const Home: FC<HomeProps> = async ({}) => {
+  return (
+    <div className="min-h-dvh">
+      <HomeTabs />
+    </div>
+  );
 };
 
 export default Home;

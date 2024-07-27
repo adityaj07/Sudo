@@ -8,6 +8,7 @@ import {
   StarterKit,
   Placeholder,
   AIHighlight,
+  CharacterCount,
 } from "novel/extensions";
 import { UploadImagesPlugin } from "novel/plugins";
 
@@ -18,6 +19,7 @@ const aiHighlight = AIHighlight;
 const placeholder = Placeholder.configure({
   placeholder: "Start writing",
 });
+const characterCount = CharacterCount.configure();
 const tiptapLink = TiptapLink.configure({
   HTMLAttributes: {
     class: cx(
@@ -117,4 +119,5 @@ export const defaultExtensions = [
   taskItem,
   horizontalRule,
   aiHighlight,
+  characterCount
 ];
