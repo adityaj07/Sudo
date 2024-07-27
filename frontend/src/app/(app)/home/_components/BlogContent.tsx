@@ -83,7 +83,7 @@ const BlogContent: FC<BlogContentProps> = ({ content }) => {
   });
 
   return (
-    <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none dark:prose-invert prose-headings:font-title font-default focus:outline-none">
+    <div className="prose lg:prose-lg xl:prose-xl max-w-none dark:prose-invert prose-headings:font-title font-default focus:outline-none text-wrap">
       <EditorContent editor={editor} />
     </div>
   );

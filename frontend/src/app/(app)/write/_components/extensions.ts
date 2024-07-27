@@ -14,7 +14,6 @@ import { UploadImagesPlugin } from "novel/plugins";
 
 import { cx } from "class-variance-authority";
 
-
 const aiHighlight = AIHighlight;
 const placeholder = Placeholder.configure({
   placeholder: "Start writing",
@@ -94,6 +93,7 @@ const starterKit = StarterKit.configure({
         "rounded-md bg-muted text-muted-foreground border p-5 font-mono font-medium"
       ),
     },
+    exitOnArrowDown: true,
   },
   code: {
     HTMLAttributes: {
@@ -119,5 +119,5 @@ export const defaultExtensions = [
   taskItem,
   horizontalRule,
   aiHighlight,
-  characterCount
+  characterCount,
 ];

@@ -57,7 +57,7 @@ const LatestBlogs: FC<LatestBlogsProps> = ({ initialData }) => {
       setIsError("Couldn&apos;t fetch latest blogs at the moment");
       setHasMore(false);
       toast({
-        title: "Oopsie!!",
+        title: "Oopsie!! Not able to fetch more blogs at the moment 😓",
         description: isError,
       });
     } finally {
