@@ -1,14 +1,6 @@
 import Link from "next/link";
 import { FC } from "react";
 import { Blog } from "@/Types/type";
-import dynamic from "next/dynamic";
-
-const ClientFormattedDate = dynamic(
-  () => import("../../_components/FormattedDate"),
-  {
-    ssr: false,
-  }
-);
 
 interface BlogCardProps {
   blog: Blog;
@@ -22,7 +14,7 @@ const BlogCard: FC<BlogCardProps> = ({ blog }) => {
         <div className="flex items-center text-gray-300 mb-4">
           <span>{blog.author?.name}</span>
           <span className="px-1">⟡</span>
-          <ClientFormattedDate date={blog.publishedAt} />
+          <span>{blog.publishedAt}</span>
         </div>
       </Link>
     </div>

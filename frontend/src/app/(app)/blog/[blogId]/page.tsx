@@ -3,14 +3,6 @@ import { FC } from "react";
 import BlogContent from "../../home/_components/BlogContent";
 import { Separator } from "@/components/ui/separator";
 import BlogPageOptions from "../_components/BlogPageOptions";
-import dynamic from "next/dynamic";
-
-const ClientFormattedDate = dynamic(
-  () => import("../../_components/FormattedDate"),
-  {
-    ssr: false,
-  }
-);
 
 interface BlogProps {
   params: {
@@ -28,7 +20,7 @@ const Blog: FC<BlogProps> = async ({ params: { blogId } }) => {
         <div className="flex items-center text-gray-300 mb-4">
           <span>{data.blog.author?.name}</span>
           <span className="px-1">⟡</span>
-          <ClientFormattedDate date={data.blog.publishedAt} />
+          <span>{data.blog.publishedAt}</span>
         </div>
         <BlogPageOptions blogId={blogId} />
       </div>
