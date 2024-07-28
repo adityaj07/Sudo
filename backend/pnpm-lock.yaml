@@ -17,6 +17,9 @@ importers:
       '@prisma/extension-accelerate':
         specifier: ^1.1.0
         version: 1.1.0(@prisma/client@5.17.0(prisma@5.17.0))
+      date-fns:
+        specifier: ^3.6.0
+        version: 3.6.0
       hono:
         specifier: ^4.4.13
         version: 4.5.0

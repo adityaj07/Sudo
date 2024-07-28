@@ -7,6 +7,7 @@ import { getCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 import { CreateBlogSchema } from "../types/Schemas/CreateBlogSchema";
 import { UpdateBlogSchema } from "../types/Schemas/UpdateBlogSchema";
+import { format } from "date-fns";
 
 export const blogRouter = new Hono<{
   Bindings: Env;
@@ -75,7 +76,7 @@ blogRouter.get(
           id: blog.id,
           title: blog.title,
           content: blog.content,
-          publishedAt: blog.publishedAt,
+          publishedAt: format(new Date(blog.publishedAt), "dd/MM/yyyy"),
           author: blog.author,
         })),
         pagination: {
@@ -157,7 +158,7 @@ blogRouter.get("/:blogId", async (c) => {
         title: blog.title,
         content: blog.content,
         published: blog.published,
-        publishedAt: blog.publishedAt,
+        publishedAt: format(new Date(blog.publishedAt), "dd/MM/yyyy"),
         author: blog.author,
       },
     };
@@ -234,7 +235,7 @@ blogRouter.post(
           data: {
             id: blogPost.id,
             published: blogPost.published,
-            publishedAt: blogPost.publishedAt,
+            publishedAt: format(new Date(blogPost.publishedAt), "dd/MM/yyyy"),
           },
         },
         200
@@ -303,7 +304,7 @@ blogRouter.put(
           data: {
             id: updatedBlogPost.id,
             published: updatedBlogPost.published,
-            publishedAt: updatedBlogPost.publishedAt,
+            publishedAt: format(new Date(updatedBlogPost.publishedAt), "dd/MM/yyyy"),
           },
         },
         200
@@ -401,7 +402,7 @@ blogRouter.post("/:blogId/publish", async (c) => {
         data: {
           id: updatedBlogPost.id,
           published: updatedBlogPost.published,
-          publishedAt: updatedBlogPost.publishedAt,
+          publishedAt: format(new Date(updatedBlogPost.publishedAt), "dd/MM/yyyy"),
         },
       },
       200

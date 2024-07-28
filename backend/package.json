@@ -8,6 +8,7 @@
     "@adityaj07/common-app": "^1.1.0",
     "@prisma/client": "5.17.0",
     "@prisma/extension-accelerate": "^1.1.0",
+    "date-fns": "^3.6.0",
     "hono": "^4.4.13",
     "resend": "^3.4.0",
     "zod": "^3.23.8"
