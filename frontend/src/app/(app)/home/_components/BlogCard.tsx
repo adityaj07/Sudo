@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import Link from "next/link";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Blog } from "@/Types/type";
 
@@ -10,11 +10,15 @@ interface BlogCardProps {
 }
 
 const BlogCard: FC<BlogCardProps> = ({ blog }) => {
+  const [formattedDate, setFormattedDate] = useState<string>("");
   // console.log(blog.content.stringify);
-  const formattedDate = format(new Date(blog.publishedAt), "dd/MM/yyyy");
+  useEffect(() => {
+    setFormattedDate(format(new Date(blog.publishedAt), "dd/MM/yyyy"));
+  }, [blog.publishedAt]);
+
   console.log("Formatted Date", formattedDate);
   console.log("Date from blog", blog.publishedAt);
-  
+
   return (
     <Link
       href={`/blog/${blog.id}`}
