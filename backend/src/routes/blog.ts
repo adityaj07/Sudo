@@ -156,6 +156,7 @@ blogRouter.get("/:blogId", async (c) => {
         id: blog.id,
         title: blog.title,
         content: blog.content,
+        published: blog.published,
         publishedAt: blog.publishedAt,
         author: blog.author,
       },
