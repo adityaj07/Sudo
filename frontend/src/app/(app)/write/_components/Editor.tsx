@@ -1,8 +1,8 @@
 "use client";
 
 import React, {
+  FC,
   useCallback,
-  // useMemo,
   useRef,
   useState,
 } from "react";
@@ -22,7 +22,6 @@ import { defaultExtensions } from "./extensions";
 import { NodeSelector } from "./selectors/node-selector";
 import { LinkSelector } from "./selectors/link-selector";
 import { ColorSelector } from "./selectors/color-selector";
-
 import { TextButtons } from "./selectors/text-buttons";
 import { slashCommand, suggestionItems } from "./slash-command";
 import { handleImageDrop, handleImagePaste } from "novel/plugins";
@@ -35,7 +34,6 @@ import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import hljs from "highlight.js";
 import { useDebouncedCallback } from "use-debounce";
-import axios from "axios";
 import {
   Drawer,
   DrawerClose,
@@ -89,28 +87,40 @@ type FormValues = {
 
 // type FormValues = z.infer<typeof FormSchema>;
 
+interface EditorProps {
+  isEditMode?: boolean;
+  initialTitle?: string;
+  initialContent?: JSONContent;
+  initialPublishedStatus?: boolean;
+  blogId?: string;
+}
+
 const extensions = [...defaultExtensions, slashCommand];
 
-const Editor = ({}) => {
+const Editor: FC<EditorProps> = ({
+  isEditMode = false,
+  initialContent,
+  initialTitle,
+  initialPublishedStatus,
+  blogId,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<string>("Saved");
-  // const [charsCount, setCharsCount] = useState(0);
   const { toast } = useToast();
   const router = useRouter();
 
   const { control, handleSubmit } = useForm<FormValues>({
     // resolver: zodResolver(FormSchema),
     defaultValues: {
-      title: "",
-      content: defaultValue,
-      published: true,
+      title: initialTitle || "",
+      content: initialContent || defaultValue,
+      published: initialPublishedStatus || true,
     },
     mode: "onSubmit",
   });
 
   const editorBubbleRef = useRef<HTMLDivElement>(null);
   const drawerCloseRef = useRef<HTMLButtonElement>(null);
-  // const drawerTriggerRef = useRef<HTMLButtonElement>(null);
 
   //Apply Codeblock Highlighting on the HTML from editor.getHTML()
   const highlightCodeblocks = (content: string) => {
@@ -125,10 +135,15 @@ const Editor = ({}) => {
 
   const onSubmit = async (data: FormValues) => {
     // console.log("This is data: ", data);
-
     try {
       setIsSubmitting(true);
-      const response = await apiClient.post(`/blogs`, data);
+      let response;
+
+      if (isEditMode) {
+        response = await apiClient.put(`/blogs/${blogId}`, data);
+      } else {
+        response = await apiClient.post(`/blogs`, data);
+      }
 
       const publishedOrDrafted = data.published ? "published" : "drafted";
 
@@ -136,18 +151,24 @@ const Editor = ({}) => {
         router.push("/home");
         router.refresh();
         toast({
-          description: `Blog ${publishedOrDrafted} successfully.`,
+          description: isEditMode
+            ? `Blog updated successfully.`
+            : `Blog ${publishedOrDrafted} successfully.`,
         });
       } else {
         toast({
-          description: `Could not pulish blog.`,
+          description: isEditMode
+            ? `Could not update blog.`
+            : `Could not publish blog.`,
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error(error);
       toast({
-        description: `Error publishing blog.`,
+        description: isEditMode
+          ? `Error updating blog.`
+          : `Error publishing blog.`,
         variant: "destructive",
       });
     } finally {
@@ -315,7 +336,7 @@ const Editor = ({}) => {
                 <Drawer>
                   <DrawerTrigger asChild>
                     <Button className="w-full" type="button">
-                      Publish
+                      {isEditMode ? `Update` : `Publish`}
                     </Button>
                   </DrawerTrigger>
                   <DrawerContent>
@@ -369,7 +390,7 @@ const Editor = ({}) => {
                           {isSubmitting && (
                             <Icons.spinner className="mr-2 size-4 animate-spin" />
                           )}
-                          Publish
+                          {isEditMode ? `Update` : `Publish`}
                         </Button>
                       </DrawerFooter>
                     </div>

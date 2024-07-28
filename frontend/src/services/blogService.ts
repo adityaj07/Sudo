@@ -1,9 +1,6 @@
 import apiClient from "@/lib/apiClient";
-import { Blog, GetLatestBlogsResponse } from "@/Types/type";
+import { Blog, GetBlogByIdResponse, GetLatestBlogsResponse } from "@/Types/type";
 
-interface GetBlogByIdResponse {
-  blog: Blog;
-}
 
 export const blogService = {
   getLatestBlogs: async (

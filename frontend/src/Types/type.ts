@@ -12,6 +12,11 @@ export interface Blog {
   author: {
     name: string;
   };
+  published: boolean;
   publishedAt: string;
   content: JSON;
+}
+
+export interface GetBlogByIdResponse {
+  blog: Blog;
 }
