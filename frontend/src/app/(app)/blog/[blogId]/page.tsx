@@ -3,7 +3,6 @@ import { FC } from "react";
 import BlogContent from "../../home/_components/BlogContent";
 import { Separator } from "@/components/ui/separator";
 import BlogPageOptions from "../_components/BlogPageOptions";
-import { formatTimeToNow, parseDateString } from "@/lib/utils";
 
 interface BlogProps {
   params: {
@@ -13,7 +12,6 @@ interface BlogProps {
 
 const Blog: FC<BlogProps> = async ({ params: { blogId } }) => {
   const data = await blogService.getBlogById(blogId);
-  const publishedAt = parseDateString(data.blog.publishedAt);
 
   return (
     <div className="container mx-auto px-0 py-2 md:px-2 md:py-4 lg:px-4 lg:py-8">
@@ -22,7 +20,7 @@ const Blog: FC<BlogProps> = async ({ params: { blogId } }) => {
         <div className="flex items-center text-gray-300 mb-4">
           <span>{data.blog.author?.name}</span>
           <span className="px-1">⟡</span>
-          <span>{formatTimeToNow(publishedAt)}</span>
+          <span>{data.blog.publishedAt}</span>
         </div>
         <BlogPageOptions blogId={blogId} />
       </div>
