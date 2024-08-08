@@ -12,7 +12,6 @@ import {
   verifyCodeSchema,
   QuerySchema,
 } from "@adityaj07/common-app";
-import { format } from "date-fns";
 
 export const userRouter = new Hono<{
   Bindings: Env;
@@ -478,7 +477,7 @@ userRouter.get(
           id: blog.id,
           title: blog.title,
           content: blog.content,
-          publishedAt: format(new Date(blog.publishedAt), "dd/MM/yyyy"),
+          publishedAt: blog.publishedAt,
           author: blog.author,
         })),
         pagination: {
@@ -551,7 +550,7 @@ userRouter.get("/blogs/:blogId", async (c) => {
         id: blog.id,
         title: blog.title,
         content: blog.content,
-        publishedAt: format(new Date(blog.publishedAt), "dd/MM/yyyy"),
+        publishedAt: blog.publishedAt,
         author: blog.author,
       },
     };
@@ -631,7 +630,7 @@ userRouter.get(
           id: draft.id,
           title: draft.title,
           content: draft.content,
-          publishedAt: format(new Date(draft.publishedAt), "dd/MM/yyyy"),
+          publishedAt: draft.publishedAt,
           author: draft.author,
         })),
         pagination: {
