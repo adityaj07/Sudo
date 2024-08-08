@@ -7,7 +7,7 @@ import { blogService } from "@/services/blogService";
 interface HomeTabsProps {}
 
 const HomeTabs: FC<HomeTabsProps> = async ({}) => {
-  const initialData = await blogService.getLatestBlogs(1);
+  const initialData = await blogService.getLatestBlogs();
 
   return (
     <Tabs defaultValue="latestBlogs" className="min-w-full">

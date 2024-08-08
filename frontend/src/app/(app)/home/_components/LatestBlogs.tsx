@@ -1,11 +1,10 @@
 "use client";
 
 import { toast } from "@/components/ui/use-toast";
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { blogService } from "@/services/blogService";
+import { Blog, GetLatestBlogsResponse } from "@/Types/type";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import BlogList from "./BlogList";
-import { Blog, GetLatestBlogsResponse } from "@/Types/type";
 
 interface LatestBlogsProps {
   initialData: GetLatestBlogsResponse;
@@ -14,31 +13,34 @@ interface LatestBlogsProps {
 interface Pagination {
   currentPage: number;
   totalPages: number;
+  pageSize: number;
+  totalCount: number;
 }
 
 const LatestBlogs: FC<LatestBlogsProps> = ({ initialData }) => {
-  const [blogs, setBlogs] = useState<Blog[]>(initialData.blogs);
+  const [blogs, setBlogs] = useState(initialData.blogs);
   const [pagination, setPagination] = useState<Pagination>(
     initialData.pagination
   );
-  const [loading, setLoading] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [isError, setIsError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasMoreBlogs, setHasMoreBlogs] = useState<boolean>(true);
 
-  const loadMoreBlogsRef = useRef<HTMLDivElement>(null);
-  const isIntersecting = useIntersectionObserver(loadMoreBlogsRef);
+  //ref of the div at the end of the bloglist which we observe to load more blogs as it intersects
+  const loaderRef = useRef<HTMLDivElement>(null);
 
-  const fetchBlogs = useCallback(async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    setIsError(null);
+  //Function to fetch more blogs as as the last div intersects
+  const fetchData = useCallback(async () => {
+    if (isLoading || !hasMoreBlogs) return;
+
+    setIsLoading(true);
 
     try {
-      const data = await blogService.getLatestBlogs(pagination.currentPage + 1);
+      const data = await blogService.getLatestBlogs(pagination.currentPage);
 
       if (data && data.blogs.length === 0) {
-        setHasMore(false);
+        setHasMoreBlogs(false); //stop further requests for blogs if there are no more blogs
       } else {
+        //If there are more blogs, filter out any duplicates based on id and update the current list of blogs with newly fetched ones
         setBlogs((prevBlogs) => {
           const newBlogs = data.blogs.filter(
             (newBlog) =>
@@ -46,48 +48,58 @@ const LatestBlogs: FC<LatestBlogsProps> = ({ initialData }) => {
           );
           return [...prevBlogs, ...newBlogs];
         });
-        setPagination((prevPagination) => ({
-          ...prevPagination,
-          currentPage: prevPagination.currentPage + 1,
-        }));
-        setHasMore(data.pagination.currentPage < data.pagination.totalPages);
       }
+
+      //Incrementing the current page
+      setPagination((prevPagination) => ({
+        ...prevPagination,
+        currentPage: prevPagination.currentPage + 1,
+      }));
+
+      //Setting the setHasMoreBlogs boolean based on if whether the current page we are on is smaller than the total number of pages, which would imply that there are yet more blogs to be loaded
+      setHasMoreBlogs(data.pagination.currentPage < data.pagination.totalPages);
     } catch (error) {
-      console.error("Error fetching latest blogs", error);
-      setIsError("Couldn&apos;t fetch latest blogs at the moment");
-      setHasMore(false);
+      console.error(error);
+      setHasMoreBlogs(false);
       toast({
         title: "Oopsie!! Not able to fetch more blogs at the moment 😓",
-        description: isError,
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [pagination, loading, hasMore]);
+  }, [pagination.currentPage, isLoading, hasMoreBlogs]);
 
+  //Logic for the observing the last div to see whther it intersects or not and unobserving it when moving onto the next set of blogs and repeat
   useEffect(() => {
-    if (blogs && blogs.length === 0 && !loading && hasMore && !isError) {
-      fetchBlogs();
-    }
-  }, [blogs.length, loading, hasMore, isError, fetchBlogs]);
+    if (!hasMoreBlogs) return;
 
-  useEffect(() => {
-    if (isIntersecting && !loading && hasMore && !isError) {
-      fetchBlogs();
+    const observer = new IntersectionObserver((entries) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
+        fetchData();
+      }
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
     }
-  }, [isIntersecting, loading, hasMore, isError, fetchBlogs]);
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [fetchData, hasMoreBlogs]);
 
   return (
     <div>
-      {blogs.length > 0 ? (
-        <BlogList blogs={blogs} />
-      ) : loading ? (
-        <p>Loading more blogs...</p>
-      ) : (
-        <p>No blogs.</p>
+      <BlogList blogs={blogs} loading={isLoading} hasMoreBlogs={hasMoreBlogs} />
+      <div ref={loaderRef} className="min-h-[2rem]" />
+      {!hasMoreBlogs && (
+        <div className="text-center text-gray-500 mt-4">
+          End of the feed. No more blogs to load.
+        </div>
       )}
-      {hasMore && <div ref={loadMoreBlogsRef} className="h-20" />}
-      {!hasMore && <p>You have reached the end of the feed.</p>}
     </div>
   );
 };

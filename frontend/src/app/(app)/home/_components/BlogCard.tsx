@@ -7,6 +7,8 @@ interface BlogCardProps {
 }
 
 const BlogCard: FC<BlogCardProps> = ({ blog }) => {
+  console.log(blog.publishedAt);
+  
   return (
     <div className="flex flex-col gap-4 rounded-[0.875rem] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] hover:bg-[#393939c5] transition-colors duration-150 border border-zinc-600/20 p-2 md:p-3 hover:cursor-pointer px-2 py-3">
       <Link href={`/blog/${blog.id}`}>

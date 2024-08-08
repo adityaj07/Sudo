@@ -1,6 +1,6 @@
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { formatDistanceToNowStrict } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 import locale from "date-fns/locale/en-US";
 
 export function cn(...inputs: ClassValue[]) {
@@ -58,4 +58,9 @@ export function formatTimeToNow(date: Date): string {
 export function parseDateString(dateString: string): Date {
   const [day, month, year] = dateString.split('/').map(Number);
   return new Date(year, month - 1, day); 
+}
+
+export function formatDate(dateString: string):string {
+  const date = new Date(dateString);
+  return format(date, 'dd/MM/yyyy'); 
 }
