@@ -2,12 +2,12 @@
 
 import { toast } from "@/components/ui/use-toast";
 import { blogService } from "@/services/blogService";
-import { Blog, GetLatestBlogsResponse } from "@/Types/type";
+import { Blog } from "@/Types/type";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import BlogList from "./BlogList";
 
 interface LatestBlogsProps {
-  initialData: GetLatestBlogsResponse;
+  // initialData: GetLatestBlogsResponse;
 }
 
 interface Pagination {
@@ -17,16 +17,38 @@ interface Pagination {
   totalCount: number;
 }
 
-const LatestBlogs: FC<LatestBlogsProps> = ({ initialData }) => {
-  const [blogs, setBlogs] = useState(initialData.blogs);
-  const [pagination, setPagination] = useState<Pagination>(
-    initialData.pagination
-  );
+const LatestBlogs: FC<LatestBlogsProps> = ({}) => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [pagination, setPagination] = useState<Pagination>({
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
+    totalCount: 0,
+  });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMoreBlogs, setHasMoreBlogs] = useState<boolean>(true);
 
   //ref of the div at the end of the bloglist which we observe to load more blogs as it intersects
   const loaderRef = useRef<HTMLDivElement>(null);
+
+  //Fetching the initial data when the component mounts
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const initialData = await blogService.getLatestBlogs();
+        setBlogs(initialData.blogs);
+        setPagination(initialData.pagination);
+      } catch (error) {
+        console.error(error);
+        setHasMoreBlogs(false);
+        toast({
+          title: "Oopsie!! Not able to fetch the latest blogs at the moment 😓",
+        });
+      }
+    };
+
+    fetchInitialData();
+  }, []);
 
   //Function to fetch more blogs as as the last div intersects
   const fetchData = useCallback(async () => {
@@ -46,7 +68,7 @@ const LatestBlogs: FC<LatestBlogsProps> = ({ initialData }) => {
             (newBlog) =>
               !prevBlogs.some((prevBlog) => prevBlog.id === newBlog.id)
           );
-          return [...prevBlogs, ...newBlogs];
+          return [...newBlogs, ...prevBlogs];
         });
       }
 

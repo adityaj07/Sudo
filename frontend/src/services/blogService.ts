@@ -5,7 +5,7 @@ import { Blog, GetBlogByIdResponse, GetLatestBlogsResponse } from "@/Types/type"
 export const blogService = {
   getLatestBlogs: async (
     page = 1,
-    pageSize = 10
+    pageSize = 10,
   ): Promise<GetLatestBlogsResponse> => {
     try {
       const response = await apiClient.get<GetLatestBlogsResponse>("/blogs", {
