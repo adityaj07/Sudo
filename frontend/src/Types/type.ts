@@ -22,3 +22,11 @@ export interface Blog {
 export interface GetBlogByIdResponse {
   blog: Blog;
 }
+
+export interface DeleteBlogResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+  };
+}

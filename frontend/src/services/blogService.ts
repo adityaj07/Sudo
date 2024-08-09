@@ -1,11 +1,15 @@
 import apiClient from "@/lib/apiClient";
-import { Blog, GetBlogByIdResponse, GetLatestBlogsResponse } from "@/Types/type";
-
+import {
+  Blog,
+  DeleteBlogResponse,
+  GetBlogByIdResponse,
+  GetLatestBlogsResponse,
+} from "@/Types/type";
 
 export const blogService = {
   getLatestBlogs: async (
     page = 1,
-    pageSize = 10,
+    pageSize = 10
   ): Promise<GetLatestBlogsResponse> => {
     try {
       const response = await apiClient.get<GetLatestBlogsResponse>("/blogs", {
@@ -32,6 +36,18 @@ export const blogService = {
     } catch (error) {
       console.error("Error in getBlogById:", error);
       throw new Error("Failed to fetch the blog");
+    }
+  },
+
+  deleteBlog: async (id: string) => {
+    try {
+      const response = await apiClient.delete<DeleteBlogResponse>(
+        `/blogs/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error in deleteBlog:", error);
+      throw new Error("Failed to delete the blog");
     }
   },
 };
