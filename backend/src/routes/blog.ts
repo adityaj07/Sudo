@@ -328,6 +328,25 @@ blogRouter.delete("/:blogId", async (c) => {
     const blogId = c.req.param("blogId");
     const authorId = c.get("userId");
 
+    const blog = await prisma.post.findUnique({
+      where: {
+        id: blogId,
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    if (blog?.authorId !== authorId) {
+      return c.json(
+        {
+          success: false,
+          message: "You cannot delete blogs of other users.",
+        },
+        500
+      );
+    }
+
     const deletedBlogPost = await prisma.post.delete({
       where: {
         id: blogId,
