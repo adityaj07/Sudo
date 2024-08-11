@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@adityaj07/common-app": "^1.1.0",
+    "@hono/zod-validator": "^0.2.2",
     "@prisma/client": "5.17.0",
     "@prisma/extension-accelerate": "^1.1.0",
     "date-fns": "^3.6.0",
