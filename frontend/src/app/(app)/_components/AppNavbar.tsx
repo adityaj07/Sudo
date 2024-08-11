@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { toast } from "@/components/ui/use-toast";
+import { userService } from "@/services/userService";
 import {
   BellIcon,
   Bookmark,
@@ -20,20 +22,37 @@ import {
   Home,
   List,
   LogOutIcon,
-  Menu,
-  Package2,
-  PenIcon,
+  Menu, PenIcon,
   Search,
   Settings,
-  User2,
+  User2
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FC } from "react";
 
 interface AppNavbarProps {}
 
 const AppNavbar: FC<AppNavbarProps> = ({}) => {
-  const handleLogout = async () => {};
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const response = await userService.logout();
+
+    if (response.success === false) {
+      toast({
+        title: "Error ☹️",
+        description: response.message,
+        variant: "destructive",
+      });
+    }
+
+    toast({
+      title: "Logged out",
+    });
+    router.push("/");
+  };
+
   return (
     <div className="">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b border-[#666666d0] bg-background px-4 md:px-6">
@@ -114,10 +133,13 @@ const AppNavbar: FC<AppNavbarProps> = ({}) => {
               className="pl-8 hidden md:flex w-full rounded-full"
             />
           </div>
-          <Button className="hidden lg:flex lg:items-center lg:gap-2 lg:justify-center lg:mr-4" asChild>
+          <Button
+            className="hidden lg:flex lg:items-center lg:gap-2 lg:justify-center lg:mr-4"
+            asChild
+          >
             <Link href="/write">
-            <PenIcon className="h-4 w-4 rounded-sm" />
-            <span className="font-semibold">Write</span>
+              <PenIcon className="h-4 w-4 rounded-sm" />
+              <span className="font-semibold">Write</span>
             </Link>
           </Button>
 

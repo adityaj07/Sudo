@@ -30,3 +30,8 @@ export interface DeleteBlogResponse {
     id: string;
   };
 }
+
+export interface ApiResponse {
+  success: boolean;
+  message: string;
+}
