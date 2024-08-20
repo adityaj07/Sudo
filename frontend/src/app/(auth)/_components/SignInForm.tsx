@@ -73,16 +73,15 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
         return;
       }
 
+      toast({
+        description: response.message,
+      });
+      router.replace("/home");
       if (response.user) {
         dispatch(setCurrentUser(response.user));
       } else {
         dispatch(setCurrentUser(null));
       }
-
-      toast({
-        description: response.message,
-      });
-      router.replace("/home");
     } catch (error) {
       console.error(error);
       toast({
