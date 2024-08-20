@@ -14,7 +14,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,9 +27,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icons } from "@/components/icons";
-import axios from "axios";
-import { truncate } from "fs";
 import apiClient from "@/lib/apiClient";
+import { userService } from "@/services/userService";
 
 interface SignupFormProps {}
 
@@ -58,14 +56,16 @@ const SignupForm: FC<SignupFormProps> = ({}) => {
         password: password.trim(),
       };
 
-      const response = await apiClient.post(`/users/sign-up`, requestData);
+      const response = await userService.signUp(requestData);
 
-      if (response.data.succes === true) {
+      if (response.success === false) {
         toast({
-          description: response.data.message,
+          description: response.message,
+          variant: "destructive",
         });
-        router.replace(`/verify-code/${response.data.user.id}`);
+        return;
       }
+      router.replace(`/verify-code/${response.user?.id}`);
     } catch (error) {
       toast({
         description: "Error signing up",

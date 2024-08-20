@@ -2,6 +2,7 @@
 
 import { Icons } from "@/components/icons";
 import { ModeToggle } from "@/components/ModeToggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,6 +15,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "@/components/ui/use-toast";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { setCurrentUser } from "@/lib/slices/userSlice";
 import { userService } from "@/services/userService";
 import {
   BellIcon,
@@ -22,10 +25,11 @@ import {
   Home,
   List,
   LogOutIcon,
-  Menu, PenIcon,
+  Menu,
+  PenIcon,
   Search,
   Settings,
-  User2
+  User2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,11 +39,13 @@ interface AppNavbarProps {}
 
 const AppNavbar: FC<AppNavbarProps> = ({}) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const handleLogout = async () => {
     const response = await userService.logout();
 
-    if (response.success === false) {
+    if (!response.success) {
       toast({
         title: "Error ☹️",
         description: response.message,
@@ -47,6 +53,7 @@ const AppNavbar: FC<AppNavbarProps> = ({}) => {
       });
     }
 
+    dispatch(setCurrentUser(null));
     toast({
       title: "Logged out",
     });
@@ -149,10 +156,15 @@ const AppNavbar: FC<AppNavbarProps> = ({}) => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
+              <Avatar>
+                {/* <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn"
+                /> */}
+                <AvatarFallback>
+                  {currentUser?.name.split("")[0]}
+                </AvatarFallback>
+              </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>

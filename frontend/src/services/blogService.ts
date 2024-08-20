@@ -3,16 +3,16 @@ import {
   Blog,
   DeleteBlogResponse,
   GetBlogByIdResponse,
-  GetLatestBlogsResponse,
+  GetBlogsResponse,
 } from "@/Types/type";
 
 export const blogService = {
   getLatestBlogs: async (
     page = 1,
     pageSize = 10
-  ): Promise<GetLatestBlogsResponse> => {
+  ): Promise<GetBlogsResponse> => {
     try {
-      const response = await apiClient.get<GetLatestBlogsResponse>("/blogs", {
+      const response = await apiClient.get<GetBlogsResponse>("/blogs", {
         params: { page, pageSize },
       });
       return response.data;
@@ -22,12 +22,20 @@ export const blogService = {
     }
   },
 
-  // getMyBlogs: async (page = 1, pageSize = 10) => {
-  //   const response = await apiClient.get<BlogResponse>("/my-blogs", {
-  //     params: { page, pageSize },
-  //   });
-  //   return response.data;
-  // },
+  getMyBlogs: async (
+    page = 1,
+    pageSize = 10
+  ): Promise<GetBlogsResponse> => {
+    try {
+      const response = await apiClient.get<GetBlogsResponse>("/users/blogs", {
+        params: { page, pageSize },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error in getMyBlogs:", error);
+      throw new Error("Failed to fetch my blogs");
+    }
+  },
 
   getBlogById: async (id: string): Promise<GetBlogByIdResponse> => {
     try {

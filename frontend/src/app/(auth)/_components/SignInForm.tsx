@@ -29,6 +29,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Icons } from "@/components/icons";
 import axios from "axios";
 import apiClient from "@/lib/apiClient";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { userService } from "@/services/userService";
+import { setCurrentUser } from "@/lib/slices/userSlice";
 
 interface SignInFormProps {}
 
@@ -36,6 +39,8 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { toast } = useToast();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const form = useForm<z.infer<typeof signInBodySchema>>({
     resolver: zodResolver(signInBodySchema),
@@ -56,23 +61,26 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
 
       // console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
 
-      const response = await apiClient.post(
-        `/users/sign-in`,
-        requestData
-      );
+      const response = await userService.signIn(requestData);
 
       // console.log(response.data);
 
-      if (response.data.success === false) {
+      if (response.success === false) {
         toast({
-          description: response.data.message,
+          description: response.message,
           variant: "destructive",
         });
         return;
       }
 
+      if (response.user) {
+        dispatch(setCurrentUser(response.user));
+      } else {
+        dispatch(setCurrentUser(null));
+      }
+
       toast({
-        description: response.data.message,
+        description: response.message,
       });
       router.replace("/home");
     } catch (error) {
@@ -136,7 +144,7 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
 
       <CardFooter>
         <div className="text-sm text-muted-foreground">
-          New customer?{" "}
+          Don&apos;t have an account yet?{" "}
           <Link
             href="/sign-up"
             className="text-primary underline-offset-4 transition-colors hover:underline"

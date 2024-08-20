@@ -1,7 +1,6 @@
 import AppNavbar from "./_components/AppNavbar";
 import Drafts from "./home/_components/Drafts";
 import HomeProfile from "./home/_components/HomeProfile";
-import Myblogs from "./home/_components/Myblogs";
 
 export default function AppLayout({ children }: React.PropsWithChildren) {
   return (
@@ -14,7 +13,6 @@ export default function AppLayout({ children }: React.PropsWithChildren) {
             <div className="fixed">
               <HomeProfile />
               <Drafts />
-              <Myblogs />
             </div>
           </div>
         </div>

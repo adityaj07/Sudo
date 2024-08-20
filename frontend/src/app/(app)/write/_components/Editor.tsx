@@ -1,11 +1,6 @@
 "use client";
 
-import React, {
-  FC,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import React, { FC, useCallback, useRef, useState } from "react";
 import {
   EditorRoot,
   EditorCommand,
@@ -362,7 +357,9 @@ const Editor: FC<EditorProps> = ({
                               </Label>
                               <Switch
                                 id="save-as-draft"
-                                checked={!field.value}
+                                checked={
+                                  !(field.value && initialPublishedStatus)
+                                }
                                 onCheckedChange={(checked) =>
                                   field.onChange(!checked)
                                 }
