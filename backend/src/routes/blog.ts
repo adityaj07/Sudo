@@ -35,7 +35,9 @@ blogRouter.get(
       const { page, pageSize, sortBy, order, author } = c.req.valid("query");
 
       const query = {
-        where: {},
+        where: {
+          published: true,
+        },
         orderBy: { [sortBy]: order },
         skip: (page - 1) * pageSize,
         take: pageSize,
@@ -49,17 +51,17 @@ blogRouter.get(
         },
       };
 
-      if (author) {
-        query.where = {
-          ...query.where,
-          author: {
-            name: {
-              contains: author,
-              mode: "insensitive",
-            },
-          },
-        };
-      }
+      // if (author) {
+      //   query.where = {
+      //     ...query.where,
+      //     author: {
+      //       name: {
+      //         contains: author,
+      //         mode: "insensitive",
+      //       },
+      //     },
+      //   };
+      // }
 
       const [blogs, totalCount] = await Promise.all([
         prisma.post.findMany(query),
@@ -75,6 +77,7 @@ blogRouter.get(
           id: blog.id,
           title: blog.title,
           content: blog.content,
+          published: blog.published,
           publishedAt: blog.publishedAt,
           author: blog.author,
         })),

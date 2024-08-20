@@ -188,7 +188,7 @@ userRouter.post(
         },
       });
 
-      console.log(existingUser);
+      // console.log(existingUser);
 
       if (!existingUser) {
         return c.json(
@@ -334,7 +334,7 @@ userRouter.post(
           200
         );
       } else if (!isCodeNotExpired) {
-        console.log(isCodeNotExpired);
+        // console.log(isCodeNotExpired);
 
         return c.json(
           {
@@ -369,7 +369,7 @@ userRouter.post(
 userRouter.use("/*", async (c, next) => {
   const tokenFromCookie = getCookie(c, "token");
 
-  console.log(tokenFromCookie);
+  // console.log(tokenFromCookie);
 
   if (!tokenFromCookie) {
     return c.json(
@@ -383,6 +383,7 @@ userRouter.use("/*", async (c, next) => {
   const user = await verify(tokenFromCookie, c.env.JWT_SECRET);
   if (user && typeof user.id === "string") {
     c.set("userId", user.id);
+    // console.log(c.get("userId"));
     return next();
   } else {
     return c.json({ success: false, message: "Unauthorized" }, 403);
@@ -432,7 +433,7 @@ userRouter.get(
       const authorId = c.get("userId");
       const { page, pageSize, sortBy, order } = c.req.valid("query");
 
-      console.log(authorId);
+      // console.log(authorId);
 
       const query = {
         where: {
@@ -477,6 +478,7 @@ userRouter.get(
           id: blog.id,
           title: blog.title,
           content: blog.content,
+          published: blog.published,
           publishedAt: blog.publishedAt,
           author: blog.author,
         })),
@@ -667,6 +669,62 @@ userRouter.get(
 //USER BLOGS ENDPOINTS END--------
 
 //USER ENDPOINTS START--------
+
+//GET CURRENT USER
+userRouter.get("/me", async (c) => {
+  const prisma = getDBInstance(c);
+  const userId = c.get("userId");
+
+  console.log(userId);
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        porfilePicture: true,
+        createdAt: true,
+        isVerified: true,
+        verifyCode: false,
+        verifyCodeExpiry: false,
+        password: false,
+      },
+    });
+
+    if (!user) {
+      return c.json(
+        {
+          success: false,
+          message: "User not exist.",
+        },
+        404
+      );
+    }
+
+    return c.json(
+      {
+        user,
+        success: true,
+        message: "User found",
+      },
+      200
+    );
+  } catch (error) {
+    return c.json(
+      {
+        success: false,
+        message: "Some error occured fetching the user.",
+        error: error,
+      },
+      500
+    );
+  }
+});
 
 //GET A USER BY id
 userRouter.get("/:id", async (c) => {
