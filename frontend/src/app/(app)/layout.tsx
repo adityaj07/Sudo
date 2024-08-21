@@ -9,12 +9,6 @@ export default function AppLayout({ children }: React.PropsWithChildren) {
       <div className="container max-w-7xl mx-auto h-full pt-6">
         <div className="relative grid min-h-dvh grid-cols-1 overflow-hidden lg:grid-cols-[65%_35%] ">
           <main>{children}</main>
-          <div className="relative   aspect-video size-full hidden lg:flex lg:flex-col lg:p-2">
-            <div className="fixed">
-              <HomeProfile />
-              <Drafts />
-            </div>
-          </div>
         </div>
       </div>
     </div>

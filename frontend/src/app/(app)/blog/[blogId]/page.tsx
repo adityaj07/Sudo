@@ -23,7 +23,7 @@ const Blog: FC<BlogProps> = async ({ params: { blogId } }) => {
           <span className="px-1">⟡</span>
           <span>{formatDate(data.blog.publishedAt)}</span>
         </div>
-        <BlogPageOptions blogId={blogId} />
+        <BlogPageOptions blogId={blogId} authorId={data.blog.author?.id} />
       </div>
       <Separator className="text-white/100 mb-4" />
       <BlogContent content={data.blog.content} />

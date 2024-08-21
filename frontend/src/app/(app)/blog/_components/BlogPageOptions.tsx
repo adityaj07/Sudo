@@ -12,26 +12,18 @@ import { useRouter } from "next/navigation";
 import { FC } from "react";
 import DeleteAlertDialog from "./DeleteAlertDialog";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/use-toast";
 import { blogService } from "@/services/blogService";
+import { useAppSelector } from "@/lib/hooks";
 
 interface BlogPageOptionsProps {
   blogId: string;
+  authorId: string;
 }
 
-const BlogPageOptions: FC<BlogPageOptionsProps> = ({ blogId }) => {
+const BlogPageOptions: FC<BlogPageOptionsProps> = ({ blogId, authorId }) => {
   const router = useRouter();
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const handleEditButtonClick = () => {
     router.push(`/edit/${blogId}`);
@@ -60,6 +52,10 @@ const BlogPageOptions: FC<BlogPageOptionsProps> = ({ blogId }) => {
       });
     }
   };
+
+  if (currentUser?.id !== authorId) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
