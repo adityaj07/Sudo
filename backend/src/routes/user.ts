@@ -188,7 +188,7 @@ userRouter.post(
         },
       });
 
-      // console.log(existingUser);
+      console.log(existingUser);
 
       if (!existingUser) {
         return c.json(
@@ -259,8 +259,9 @@ userRouter.post(
         httpOnly: true,
         sameSite: "None",
         maxAge: cookieMaxAge,
+        domain:"https://sudo-blog.vercel.app"
       });
-
+      console.log("Cookie set",getCookie(c,"token"))
       return c.json(
         {
           success: true,
@@ -270,7 +271,9 @@ userRouter.post(
         },
         200
       );
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 );
 
@@ -369,7 +372,7 @@ userRouter.post(
 userRouter.use("/*", async (c, next) => {
   const tokenFromCookie = getCookie(c, "token");
 
-  // console.log(tokenFromCookie);
+  console.log(tokenFromCookie);
 
   if (!tokenFromCookie) {
     return c.json(
