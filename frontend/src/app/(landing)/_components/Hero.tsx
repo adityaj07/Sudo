@@ -1,10 +1,9 @@
 import { FC } from "react";
 import Line from "./ui/Line";
-import ReactTextareaAutosize from "react-textarea-autosize";
 // import PromptInput from "./PromptInput";
-import Arrow from "./ui/Arrow";
-import { ArrowBigDown, ArrowDownIcon, SparkleIcon } from "lucide-react";
+import { SparkleIcon } from "lucide-react";
 import Link from "next/link";
+import Arrow from "./ui/Arrow";
 
 interface HeroProps {}
 
@@ -30,7 +29,10 @@ const Hero: FC<HeroProps> = ({}) => {
           className="flex justify-center items-start bg-black border border-orange-300/20 rounded-lg text-white px-2 py-4 min-w-[30rem]"
           placeholder="Create a banner for a hackathon happening in mumbai"
         /> */}
-        <Link href="/sign-in" className=" hover:shadow-[0_4px_14px_0_#f58123d5] px-8 py-2 bg-[#f87c17] rounded-md text-white font-semibold transition duration-200 ease-linear relative flex gap-2 justify-center items-center">
+        <Link
+          href="/sign-in"
+          className=" hover:shadow-[0_4px_14px_0_#f58123d5] px-8 py-2 bg-[#f87c17] rounded-md text-white font-semibold transition duration-200 ease-linear relative flex gap-2 justify-center items-center"
+        >
           <Arrow className="absolute -top-10 w-32 -right-20" />
           Sudo Login
           <SparkleIcon className="w-4 h-4" />
