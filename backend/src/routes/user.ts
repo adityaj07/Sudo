@@ -259,9 +259,9 @@ userRouter.post(
         httpOnly: true,
         sameSite: "None",
         maxAge: cookieMaxAge,
-        domain:"https://sudo-blog.vercel.app"
+        // domain:"https://sudo-blog.vercel.app"
       });
-      console.log("Cookie set",getCookie(c,"token"))
+      console.log("Cookie set", getCookie(c, "token"));
       return c.json(
         {
           success: true,

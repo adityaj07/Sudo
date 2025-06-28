@@ -358,7 +358,7 @@ const Editor: FC<EditorProps> = ({
                               <Switch
                                 id="save-as-draft"
                                 checked={
-                                  !(field.value && initialPublishedStatus)
+                                  !(field.value)
                                 }
                                 onCheckedChange={(checked) =>
                                   field.onChange(!checked)

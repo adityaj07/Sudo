@@ -32,11 +32,11 @@
   }
 
   .dark {
-    --background: 0 0 0% ;
+    --background: 0 0 0%;
     --foreground: 210 40% 98%;
-    --card: 240 10% 4% ;
+    --card: 240 10% 4%;
     --card-foreground: 210 40% 98%;
-    --popover: 240 10% 4% ;
+    --popover: 240 10% 4%;
     --popover-foreground: 210 40% 98%;
     --primary: 32 100% 49%;
     --primary-foreground: 222.2 47.4% 11.2%;
@@ -73,7 +73,6 @@
     --novel-highlight-orange: #faebdd;
     --novel-highlight-pink: #faf1f5;
     --novel-highlight-gray: #f1f1ef;
-
   }
 
   .dark {
@@ -86,9 +85,44 @@
     --novel-highlight-orange: #5c3a1a;
     --novel-highlight-pink: #5c1a3a;
     --novel-highlight-gray: #3a3a3a;
-
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Add these animations to your global CSS file (likely globals.css or tailwind.css) */
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Add gradient-radial utility if not already present */
+@layer utilities {
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle, var(--tw-gradient-stops));
   }
 }
