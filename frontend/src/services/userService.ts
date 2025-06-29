@@ -35,6 +35,17 @@ export const userService = {
     }
   },
 
+  testLogin: async () => {
+    let res;
+    try {
+      res = await apiClient.post<ApiResponse>("/users/test-login");
+      return res.data;
+    } catch (error) {
+      console.log("Error in userService.testLogin: ", error);
+      throw new Error(res?.data.message);
+    }
+  },
+
   logout: async () => {
     let res;
     try {

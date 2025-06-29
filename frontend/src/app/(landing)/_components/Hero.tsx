@@ -37,14 +37,15 @@ const Hero: FC<HeroProps> = ({}) => {
           Sudo Login
           <SparkleIcon className="w-4 h-4" />
         </Link>
-      </div>
 
-      {/* <div className="flex justify-center items-center gap-4 text-white mt-24">
-        <ArrowDownIcon className="w-6 h-6 animate-bounce" />
-        <span className="font-light text-base">
-          Scroll down
-        </span>
-      </div> */}
+        {/* Test Demo Button */}
+        <Link
+          href="/sign-in?demo=true"
+          className="px-6 py-2 border-2 border-orange-200 text-orange-600 hover:bg-orange-50 rounded-lg font-semibold transition-all duration-200 ease-linear flex gap-2 justify-center items-center text-sm dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-950"
+        >
+          🧪 Try Demo
+        </Link>
+      </div>
     </section>
   );
 };

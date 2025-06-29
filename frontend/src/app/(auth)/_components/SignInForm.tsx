@@ -26,8 +26,8 @@ import { userService } from "@/services/userService";
 import { signInBodySchema } from "@adityaj07/common-app";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FC, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FC, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -39,6 +39,14 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const searchParams = useSearchParams();
+  const isDemoMode = searchParams?.get("demo") === "true";
+
+  useEffect(() => {
+    if (isDemoMode && !isSubmitting) {
+      handleTestLogin();
+    }
+  }, [isDemoMode]);
 
   const form = useForm<z.infer<typeof signInBodySchema>>({
     resolver: zodResolver(signInBodySchema),
@@ -85,6 +93,39 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
     }
   };
 
+  const handleTestLogin = async () => {
+    try {
+      setIsSubmitting(true);
+      const response = await userService.testLogin();
+
+      if (response.success === false) {
+        toast({
+          description: response.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        description: `${response.message} 🧪`,
+      });
+
+      if (response.user) {
+        dispatch(setCurrentUser(response.user));
+      }
+
+      router.replace("/home");
+    } catch (error) {
+      console.error(error);
+      toast({
+        description: "Error with test login",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Card className="border border-orange-100/50 shadow-2xl shadow-orange-500/5 bg-white/95 backdrop-blur-xl dark:bg-gray-950/95 dark:border-orange-900/30 dark:shadow-orange-500/10">
       <CardHeader className="space-y-3 text-center pb-8">
@@ -92,7 +133,13 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
           Welcome back
         </CardTitle>
         <CardDescription className="text-gray-600 dark:text-gray-400 text-base">
-          Continue your writing journey
+          {isDemoMode ? (
+            <span className="text-orange-600 dark:text-orange-400">
+              🧪 Logging you in with demo account...
+            </span>
+          ) : (
+            "Continue your writing journey"
+          )}
         </CardDescription>
       </CardHeader>
 
@@ -149,6 +196,33 @@ const SignInForm: FC<SignInFormProps> = ({}) => {
                 <Icons.spinner className="mr-2 size-4 animate-spin" />
               )}
               Sign in
+            </Button>
+
+            {/* Test Login Button */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200 dark:border-gray-700" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white dark:bg-gray-950 px-2 text-gray-500 dark:text-gray-400">
+                  Or try demo
+                </span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleTestLogin}
+              className="w-full h-12 border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700 dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-950 dark:hover:text-orange-300 font-semibold rounded-xl transition-all duration-200 disabled:opacity-50"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <Icons.spinner className="mr-2 size-4 animate-spin" />
+              ) : (
+                <span className="mr-2">🧪</span>
+              )}
+              Demo Login (Test User)
             </Button>
           </form>
         </Form>

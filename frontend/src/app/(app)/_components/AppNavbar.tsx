@@ -2,7 +2,7 @@
 
 import { Icons } from "@/components/icons";
 import { ModeToggle } from "@/components/ModeToggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,7 +21,6 @@ import { userService } from "@/services/userService";
 import {
   BellIcon,
   Bookmark,
-  CircleUser,
   Home,
   List,
   LogOutIcon,
@@ -156,15 +155,19 @@ const AppNavbar: FC<AppNavbarProps> = ({}) => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar>
-                {/* <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                /> */}
-                <AvatarFallback>
-                  {currentUser?.name.split("")[0]}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar>
+                  <AvatarFallback>
+                    {currentUser?.name.split("")[0]}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Test User Badge */}
+                {currentUser?.email === "test@sudo.dev" && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs text-white">🧪</span>
+                  </div>
+                )}
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>

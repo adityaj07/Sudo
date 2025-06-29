@@ -1,17 +1,17 @@
+import {
+  QuerySchema,
+  signInBodySchema,
+  signUpBodySchema,
+  verifyCodeSchema,
+} from "@adityaj07/common-app";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { Env } from "../types/types";
-import { getDBInstance } from "../db/utils";
-import { sha256 } from "hono/utils/crypto";
-import { sendVerificationEmail } from "../lib/sendVerificationEmail";
-import { sign, verify } from "hono/jwt";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import {
-  signUpBodySchema,
-  signInBodySchema,
-  verifyCodeSchema,
-  QuerySchema,
-} from "@adityaj07/common-app";
+import { sign, verify } from "hono/jwt";
+import { sha256 } from "hono/utils/crypto";
+import { getDBInstance } from "../db/utils";
+import { sendVerificationEmail } from "../lib/sendVerificationEmail";
+import { Env } from "../types/types";
 
 export const userRouter = new Hono<{
   Bindings: Env;
@@ -276,6 +276,88 @@ userRouter.post(
     }
   }
 );
+
+//TEST USER LOGIN ENDPOINT
+userRouter.post("/test-login", async (c) => {
+  try {
+    const prisma = getDBInstance(c);
+
+    // Test user credentials
+    const testEmail = "test@sudo.dev";
+    const testPassword = "test123";
+    const testName = "Test User";
+
+    // Check if test user exists
+    let testUser = await prisma.user.findUnique({
+      where: {
+        email: testEmail,
+      },
+    });
+
+    // Create test user if doesn't exist
+    if (!testUser) {
+      const hashedPassword = await sha256(testPassword);
+
+      testUser = await prisma.user.create({
+        data: {
+          email: testEmail,
+          name: testName,
+          password: hashedPassword as string,
+          isVerified: true, // Auto-verified test user
+          verifyCode: "000000",
+          verifyCodeExpiry: new Date(Date.now() + verifyCodeExpiryTime),
+        },
+      });
+    }
+
+    // Generate JWT token
+    const token = await sign({ id: testUser.id }, c.env.JWT_SECRET);
+
+    // Get user data for response
+    const userResponse = await prisma.user.findUnique({
+      where: {
+        email: testEmail,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        porfilePicture: true,
+        createdAt: true,
+        isVerified: true,
+      },
+    });
+
+    // Set cookie
+    setCookie(c, "token", token, {
+      secure: true,
+      httpOnly: true,
+      sameSite: "None",
+      maxAge: cookieMaxAge,
+    });
+
+    return c.json(
+      {
+        success: true,
+        jwt: token,
+        message: "Test user logged in successfully.",
+        user: userResponse,
+        isTestUser: true,
+      },
+      200
+    );
+  } catch (error) {
+    console.error("Test login error:", error);
+    return c.json(
+      {
+        success: false,
+        message: "Error logging in test user.",
+      },
+      500
+    );
+  }
+});
 
 //VERIFY VERIFICATION CODE ENDPOINT
 userRouter.post(
